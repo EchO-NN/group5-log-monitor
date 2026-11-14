@@ -1,0 +1,15 @@
+[Unit]
+Description=Group5 IRIS investigation agent
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/group5-log-monitor
+ExecStart=/usr/bin/python3 /opt/group5-log-monitor/scripts/summary-worker.py --config /etc/group5-monitor/summary-provider.local.json
+Restart=on-failure
+RestartSec=20
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target

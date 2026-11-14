@@ -1,0 +1,12 @@
+[
+ {"id":1,"name":"演练入口与认证请求","required":["web_request","mail_sample","browser_record","acl_allow"],"attck":["T1566.002","T1056.003"]},
+ {"id":2,"name":"员工机登录与环境枚举","required":["ssh_login","command_execution"],"attck":["T1078.003","T1021.004","T1082"]},
+ {"id":3,"name":"网络发现与微隔离","required":["acl_drop","acl_allow","discovery_process"],"attck":["T1018","T1046","T1016"]},
+ {"id":4,"name":"课程归档及文件访问","required":["sensitive_file_access","credential_tool","vm3_cpu"],"attck":["T1083","T1552.001","T1552.004","T1110.002"]},
+ {"id":5,"name":"共享访问与Git历史","required":["smb_access","git_execution","credential_tool"],"attck":["T1135","T1039","T1552.001"]},
+ {"id":6,"name":"应用认证与权限审计","required":["ssh_publickey","ssh_password","sudoedit_activity","privilege_identity","sensitive_config_access"],"attck":["T1021.004","T1068","T1548.003","T1140"]},
+ {"id":7,"name":"数据库查询与测试数据流转","required":["sql_read","sql_export","data_transfer"],"attck":["T1213","T1041"]},
+ {"id":8,"name":"备份访问与完整性","required":["backup_login","backup_change","backup_integrity_failure","backup_inventory"],"attck":["T1490","T1485","T1021.004"]},
+ {"id":9,"name":"业务故障与恢复","required":["sql_change","application_sql_error","business_probe_failure","restore_verification","offline_backup_verification"],"attck":["T1485","T1565.001"]},
+ {"id":10,"name":"日志完整性与集中取证","required":["application_log_change","log_hash_comparison","central_original_preserved","cross_host_timeline"],"attck":["T1070"]}
+]

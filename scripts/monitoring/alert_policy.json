@@ -1,0 +1,11 @@
+{
+  "version": "wazuh-facts-v1",
+  "min_level": 7,
+  "critical_accounts": ["dev_zhang", "app_ops", "bk_operator", "db_admin"],
+  "authentication_rules": ["5715", "5716", "5710", "5503", "5557", "2501"],
+  "sudo_rules": ["5401", "5402", "5403"],
+  "file_rules": ["554"],
+  "file_prefixes": ["/lab_backup/", "/var/log/group5-drill/", "/opt/test-web/config/", "/opt/lab-sudo/etc/sudoers"],
+  "execution_rules": ["92601"],
+  "group_window_seconds": 300
+}

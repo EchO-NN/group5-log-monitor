@@ -1,0 +1,124 @@
+{
+  "version": 2,
+  "local_file_root": "/opt/group5-log-monitor",
+  "hosts": [
+    {
+      "id": "VM1",
+      "role": 1,
+      "address": "192.168.34.5",
+      "description": "攻击机；仅识别防守日志中的来源，不主动查询",
+      "hostname": "kali",
+      "active_query": false,
+      "queries": []
+    },
+    {
+      "id": "VM2",
+      "role": 2,
+      "address": "192.168.59.10",
+      "description": "网关与访问控制",
+      "hostname": "vm2-gateway",
+      "queries": [
+        "authentication",
+        "audit",
+        "services"
+      ]
+    },
+    {
+      "id": "VM3",
+      "role": 3,
+      "address": "192.168.33.15",
+      "description": "员工工作站",
+      "hostname": "admin",
+      "queries": [
+        "authentication",
+        "audit",
+        "services"
+      ]
+    },
+    {
+      "id": "VM4",
+      "role": 4,
+      "address": "192.168.32.20",
+      "description": "文件服务",
+      "hostname": "vm4-fire-file",
+      "queries": [
+        "authentication",
+        "audit",
+        "services"
+      ]
+    },
+    {
+      "id": "VM5",
+      "role": 5,
+      "address": "192.168.31.30",
+      "description": "应用服务",
+      "hostname": "vm5",
+      "queries": [
+        "authentication",
+        "audit",
+        "services",
+        "application_errors"
+      ]
+    },
+    {
+      "id": "VM6",
+      "role": 6,
+      "address": "192.168.30.40",
+      "description": "数据库服务",
+      "hostname": "vm6",
+      "queries": [
+        "authentication",
+        "audit",
+        "services",
+        "database_changes"
+      ]
+    },
+    {
+      "id": "VM7",
+      "role": 7,
+      "address": "192.168.29.50",
+      "description": "备份服务",
+      "hostname": "vm7-backup-srv",
+      "queries": [
+        "authentication",
+        "audit",
+        "services",
+        "backup_inventory"
+      ]
+    },
+    {
+      "id": "VM8",
+      "role": 8,
+      "address": "192.168.50.10",
+      "description": "日志监控与案件管理",
+      "hostname": "vm8-log-mon",
+      "queries": [
+        "authentication",
+        "audit",
+        "services"
+      ]
+    },
+    {
+      "id": "VM9",
+      "role": 9,
+      "address": "192.168.50.11",
+      "description": "指标监控",
+      "hostname": "vm9",
+      "queries": [
+        "authentication",
+        "audit",
+        "services",
+        "business_probes",
+        "performance_metrics",
+        "performance_correlations"
+      ]
+    }
+  ],
+  "max_steps": 28,
+  "max_queries": 10,
+  "max_tasks": 4,
+  "max_total_tokens": 250000,
+  "window_padding_seconds": 120,
+  "max_window_seconds": 7200,
+  "inventory_verified_at": "2026-11-05T04:08:38+08:00"
+}

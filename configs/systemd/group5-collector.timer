@@ -1,0 +1,10 @@
+[Unit]
+Description=Collect Group5 telemetry every minute
+
+[Timer]
+OnBootSec=30s
+OnUnitInactiveSec=60s
+Unit=group5-collector.service
+
+[Install]
+WantedBy=timers.target

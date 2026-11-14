@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "group5-log-monitor"
+version = "1.1.0"
+description = "Wazuh, IRIS and Prometheus incident investigation workflow"
+readme = "README.md"
+requires-python = ">=3.10"
+authors = [{name = "Yuanzhe Ni"}]
+dependencies = []
+
+[tool.setuptools]
+packages = ["monitoring"]
+package-dir = {monitoring = "scripts/monitoring"}
+
+[tool.setuptools.package-data]
+monitoring = ["*.json"]

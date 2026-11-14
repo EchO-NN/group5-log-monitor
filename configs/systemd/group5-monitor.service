@@ -1,0 +1,12 @@
+[Unit]
+Description=Group5 Wazuh to IRIS evidence bridge
+After=network-online.target wazuh-manager.service
+
+[Service]
+ExecStart=/usr/bin/python3 /usr/local/lib/group5-monitor/bridge.py --config /etc/group5-monitor/config.json daemon
+Restart=on-failure
+RestartSec=10
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

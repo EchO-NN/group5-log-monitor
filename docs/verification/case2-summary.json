@@ -1,0 +1,360 @@
+{
+  "case_id": 2,
+  "state": "done",
+  "nodes": 14,
+  "relations": 12,
+  "sections": {
+    "timeline": 14,
+    "tasks": 3,
+    "assets": 5,
+    "notes": 3,
+    "evidence": 4
+  },
+  "audit": {
+    "VM5 / 全部允许字段": {
+      "pages": 74,
+      "records": 5609,
+      "coverage_complete": true
+    },
+    "VM5 / /tmp/": {
+      "pages": 5,
+      "records": 9,
+      "coverage_complete": true
+    },
+    "VM7 / 全部允许字段": {
+      "pages": 8,
+      "records": 419,
+      "coverage_complete": true
+    }
+  },
+  "overview": "确认发生造成实际影响的人为破坏性安全事件：VM7备份归档被删除，VM6两张业务表重命名导致VM5订单、工单业务访问中断；同时存在经VM3、VM5至VM7的账号访问路径及VM5高权限执行。技术影响为高置信，整体倾向破坏性攻击，但恶意意图仅中等置信，尚需核实是否为获批演练。",
+  "gaps": [
+    "VM3、VM5认证返回有截断；VM5、VM7审计虽已完成留存快照覆盖，仍不代表全部历史完整。",
+    "初始凭据来源、具体提权机制、跨机统一会话及数据库操作者未完全绑定，授权与恶意意图待核实。",
+    "业务恢复、备份可还原性及准确恢复时刻未验证。"
+  ],
+  "timeline": [
+    {
+      "at": "2026-11-05T03:26:48.363016+08:00",
+      "title": "VM3接受来源192.168.34.5的账号登录",
+      "content": "VM3的sshd接受192.168.34.5使用dev_zhang的密码认证，并为uid=1001打开会话。仅确认防守侧观察到的来源、账号与认证成功。",
+      "references": [
+        "E001",
+        "A001"
+      ],
+      "chain_note": "本轮可定位的访问起点；凭据如何获得及实际操作者身份未确认，不向前补写入侵步骤。",
+      "links": [],
+      "chain_key": "L01"
+    },
+    {
+      "at": "2026-11-05T03:26:51.460000+08:00",
+      "title": "网关拒绝同一来源访问文件服务445端口",
+      "content": "VM8接收的VM2网关日志记录192.168.34.5到192.168.32.20:445的TCP SYN被ACL丢弃；这证明该访问被阻断，不证明VM4遭入侵。",
+      "references": [
+        "A002",
+        "E001"
+      ],
+      "chain_note": "并行的被阻断访问分支；相同来源与时间相邻不足以说明VM3登录造成该连接。",
+      "links": [
+        {
+          "from": "L01",
+          "relation": "temporal",
+          "confidence": "confirmed",
+          "basis": "登录与ACL日志均出现192.168.34.5且时间相邻；没有会话或进程证据证明因果。",
+          "references": [
+            "E001",
+            "A002"
+          ]
+        }
+      ],
+      "chain_key": "L02"
+    },
+    {
+      "at": "2026-11-05T03:27:31.793880+08:00",
+      "title": "VM5接受来自VM3地址的app_ops登录",
+      "content": "VM5认证日志记录来自192.168.33.15:58138的app_ops先通过公钥部分认证，随后密码认证成功，并打开uid=1001会话。",
+      "references": [
+        "E024",
+        "A006",
+        "E001"
+      ],
+      "chain_note": "确认从员工工作站地址到应用主机的认证路径；跨主机同一操作者及凭据获取方式仍是断点。",
+      "links": [
+        {
+          "from": "L01",
+          "relation": "enables",
+          "confidence": "inferred",
+          "basis": "前序在VM3建立登录，后序VM5认证来源正是VM3地址，支持工作站作为后续访问条件；尚无跨机统一会话绑定。",
+          "references": [
+            "E001",
+            "E024"
+          ]
+        }
+      ],
+      "chain_key": "L03"
+    },
+    {
+      "at": "2026-11-05T03:27:33.310+08:00",
+      "title": "VM5以应用账号上下文执行root身份检查",
+      "content": "VM5审计记录显示auid=1001的sudo子进程成功执行/usr/bin/id，进程uid/euid为0；这证实该次会话上下文获得root执行权限，但不单独证明其具体提权机制。",
+      "references": [
+        "A008",
+        "E024",
+        "E034"
+      ],
+      "chain_note": "承接VM3来源登录后的VM5会话，形成权限提升后的执行条件；sudo审计与SSH会话未以同一会话ID完全绑定。",
+      "links": [
+        {
+          "from": "L03",
+          "relation": "enables",
+          "confidence": "inferred",
+          "basis": "VM5登录账号app_ops为uid=1001，后续审计auid=1001并出现uid/euid=0，支持同一账号上下文提供执行条件，但没有跨记录会话ID。",
+          "references": [
+            "E024",
+            "E034"
+          ]
+        }
+      ],
+      "chain_key": "L04"
+    },
+    {
+      "at": "2026-11-05T03:27:41.537000+08:00",
+      "title": "VM7成功删除备份归档文件",
+      "content": "审计43543同时记录成功unlink（syscall=87）、uid/euid/auid=1001、sshd进程157202及目标/lab_backup/star_web_v2.3_stable.tar.gz。两处受监控路径的同名同哈希删除告警不能直接算作两份独立备份。",
+      "references": [
+        "A030",
+        "A031",
+        "E096",
+        "E017"
+      ],
+      "chain_note": "删除调用与文件对象已直接绑定；与VM5来源备份会话的关联有身份和父进程凭据支持，但具体会话及人的归因仍保留推断。",
+      "links": [
+        {
+          "from": "L07",
+          "relation": "enables",
+          "confidence": "inferred",
+          "basis": "E017记录bk_operator(uid=1001)的SFTP会话覆盖删除时刻；E096记录该时段sshd凭据子进程157201，删除进程157202的ppid正是157201，且auid=1001。认证摘要未直接返回进程号，故跨来源会话绑定仍为推断。",
+          "references": [
+            "E017",
+            "E096"
+          ]
+        }
+      ],
+      "chain_key": "L05"
+    },
+    {
+      "at": "2026-11-05T03:27:45.519+08:00",
+      "title": "数据库收到两张业务表重命名",
+      "content": "VM6保存的数据库日志记录lab_orders和lab_tickets被重命名为带rehearsal_hold时间标记的对象，执行结果字段要求用独立证据验证效果。该记录证明结构变更语句已收到，不单独证明永久删除数据。",
+      "references": [
+        "E005"
+      ],
+      "chain_note": "数据库影响分支的结构变更节点；数据库操作人与VM5具体会话未绑定，命名和后续反向变更保留获批演练的替代解释。",
+      "links": [],
+      "chain_key": "L06"
+    },
+    {
+      "at": "2026-11-05T03:27:40.606091+08:00",
+      "title": "VM7接受来自VM5的备份账号认证",
+      "content": "VM7接受192.168.31.30:58728以bk_operator进行公钥认证，随后打开uid=1001会话，并在03:27:41.104启动internal-sftp。",
+      "references": [
+        "E017",
+        "E024",
+        "A029"
+      ],
+      "chain_note": "形成应用主机到备份目录的访问条件；VM5上的具体发起进程及跨机同一操作者未绑定。",
+      "links": [
+        {
+          "from": "L03",
+          "relation": "enables",
+          "confidence": "inferred",
+          "basis": "VM5已有app_ops登录，备份认证来源为VM5地址；支持应用主机作为后续访问条件，但没有跨机进程或会话统一标识。",
+          "references": [
+            "E024",
+            "E017"
+          ]
+        }
+      ],
+      "chain_key": "L07"
+    },
+    {
+      "at": "2026-11-05T03:27:47.126000+08:00",
+      "title": "应用开始报业务表不存在错误",
+      "content": "VM5应用首先对lab_business.lab_orders报1146/table_not_found，03:27:47.395起lab_business.lab_tickets也报同类错误；保存记录持续至03:28:42.580。",
+      "references": [
+        "E005",
+        "E006"
+      ],
+      "chain_note": "与前序重命名的两个对象逐一匹配，交叉证实原表名已不可供应用访问；不据此认定数据被永久删除。",
+      "links": [
+        {
+          "from": "L06",
+          "relation": "causal",
+          "confidence": "confirmed",
+          "basis": "数据库先收到lab_orders、lab_tickets重命名，应用随后对同名对象持续报1146，不仅有SQL接收记录，还有匹配对象的实际后果。",
+          "references": [
+            "E005",
+            "E006"
+          ]
+        }
+      ],
+      "chain_key": "L08"
+    },
+    {
+      "at": "2026-11-05T03:27:58.531000+08:00",
+      "title": "VM7上报备份完整性检查失败",
+      "content": "VM7告警捕获backup-integrity-check的FAILED/file_unreadable；正文事件时间为03:27:58.228535。多渠道捕获同类消息不按独立故障次数累计。",
+      "references": [
+        "A036",
+        "A030",
+        "E096"
+      ],
+      "chain_note": "删除后出现备份不可读后果；检查消息未明确逐项文件路径，因此对特定归档的因果联系保留推断。TEST_SYNTHETIC为数据集标签，不是合成联调标记。",
+      "links": [
+        {
+          "from": "L05",
+          "relation": "causal",
+          "confidence": "inferred",
+          "basis": "VM7目标备份已被成功unlink，随后同机完整性检查报file_unreadable，与删除后不可读相符；检查摘要没有列出具体失败对象。",
+          "references": [
+            "E096",
+            "A030",
+            "A036"
+          ]
+        }
+      ],
+      "chain_key": "L09"
+    },
+    {
+      "at": "2026-11-05T03:28:13.035307+08:00",
+      "title": "订单与工单业务探测失败",
+      "content": "VM9保存的业务探测分别在03:28:13.035307与03:28:13.321573记录orders、tickets失败；HTTP状态未返回，不能据此认定特定状态码或TCP端口关闭。",
+      "references": [
+        "E005",
+        "E006",
+        "E010"
+      ],
+      "chain_note": "数据库结构变更、同名表报错与对应业务失败相互印证实际服务影响；没有请求追踪ID把每次探测与单条应用错误直接绑定。",
+      "links": [
+        {
+          "from": "L08",
+          "relation": "causal",
+          "confidence": "inferred",
+          "basis": "orders/tickets对应两张缺失表；探测失败时同名对象仍持续报1146，时间与业务对象均吻合，但没有逐请求统一标识。",
+          "references": [
+            "E006",
+            "E010",
+            "E005"
+          ]
+        }
+      ],
+      "chain_key": "L10"
+    },
+    {
+      "at": "2026-11-05T03:28:31+08:00",
+      "title": "VM5出现临时目录脚本执行告警",
+      "content": "A037记录Python成功exec、auid=1001且uid/euid=0；随后同组告警记录sudo与dash执行上下文。规则命中临时目录脚本，但已读取的结构化审计未提供该组脚本的完整参数和行为后果。",
+      "references": [
+        "A037",
+        "A038",
+        "A039",
+        "E034",
+        "E054"
+      ],
+      "chain_note": "保留为后续执行分支；它晚于备份删除与表变更，不能将其倒写成两项先前破坏的原因，也不能仅凭规则名称认定具体恶意载荷。",
+      "links": [
+        {
+          "from": "L04",
+          "relation": "temporal",
+          "confidence": "confirmed",
+          "basis": "均为VM5上auid=1001的高权限执行相关记录，但没有相同进程或会话标识证明是同一执行链，仅确认先后关系。",
+          "references": [
+            "E034",
+            "A037",
+            "A038",
+            "A039"
+          ]
+        }
+      ],
+      "chain_key": "L11"
+    },
+    {
+      "at": "2026-11-05T03:28:45.819920+08:00",
+      "title": "数据库收到业务表反向重命名语句",
+      "content": "VM6保存日志记录将两张rehearsal_hold_20261105032745业务表改回lab_orders和lab_tickets的语句；日志只证明收到请求，保存遥测没有之后的成功业务探测。",
+      "references": [
+        "E005",
+        "E006",
+        "E010"
+      ],
+      "chain_note": "原表变更的回退尝试；不能将反向语句收到或后续未保存错误等同于数据库及业务恢复成功。",
+      "links": [
+        {
+          "from": "L06",
+          "relation": "continuation",
+          "confidence": "confirmed",
+          "basis": "反向语句使用前序两个完整的重命名目标并改回原名，直接对应同一组数据库对象；不据此认定同一操作者。",
+          "references": [
+            "E005"
+          ]
+        }
+      ],
+      "chain_key": "L12"
+    },
+    {
+      "at": "2026-11-05T03:28:55.670000+08:00",
+      "title": "VM7被删除的同名备份重新创建",
+      "content": "A052捕获/lab_backup/star_web_v2.3_stable.tar.gz新增瞬间为零字节、属主bk_operator；03:28:55.726审计43622将同路径与成功openat、uid/euid/auid=1001、sshd进程157522绑定。E017记录该时段来自VM5的备份账号SFTP会话。",
+      "references": [
+        "A052",
+        "E017",
+        "E097",
+        "A030",
+        "E096"
+      ],
+      "chain_note": "确认同名归档重建，不将创建瞬间的空文件状态视为最终状态，也不单凭openat判断写入内容或完成恢复。",
+      "links": [
+        {
+          "from": "L05",
+          "relation": "continuation",
+          "confidence": "confirmed",
+          "basis": "删除告警及审计与新增告警及审计指向同一绝对路径，形成对象层面的删除后重建；未证明操作由同一人完成。",
+          "references": [
+            "A030",
+            "A052",
+            "E096",
+            "E097"
+          ]
+        }
+      ],
+      "chain_key": "L13"
+    },
+    {
+      "at": "2026-11-05T06:06:43.308846+08:00",
+      "title": "当前清单确认目标备份字节完整性已恢复",
+      "content": "只读备份清单采集时，目标归档存在、1861字节、SHA-256与清单预期及删除前记录一致，读取期间稳定。该结果是06:06:43的当前快照，不是03:28:55的历史校验结果。",
+      "references": [
+        "E013",
+        "A030",
+        "A052"
+      ],
+      "chain_note": "证实查询时该文件字节完整性已恢复；未验证解包、还原及业务恢复，也不能用mtime确定恢复完成时刻。",
+      "links": [
+        {
+          "from": "L13",
+          "relation": "continuation",
+          "confidence": "confirmed",
+          "basis": "重建告警与当前清单为同一绝对路径；清单显示后续完整文件状态，但无法确定从零字节变为完整归档的准确时间。",
+          "references": [
+            "A052",
+            "E013"
+          ]
+        }
+      ],
+      "chain_key": "L14"
+    }
+  ],
+  "evidence_date": "2026-11-05",
+  "source": "Case 2 已完成调查的脱敏核验摘要",
+  "vm9_performance_extension": "2026-11-15 新增，未用于重写历史 Case 2 结果"
+}

@@ -1,0 +1,11 @@
+<group name="group5,">
+  <rule id="100510" level="7">
+    <match>VM2-ACL DROP</match>
+    <description>Group5: VM2 ACL rejected traffic</description>
+  </rule>
+  <rule id="100511" level="12">
+    <program_name>backup-integrity-check</program_name>
+    <match>status=FAILED</match>
+    <description>Group5: backup integrity verification FAILED</description>
+  </rule>
+</group>

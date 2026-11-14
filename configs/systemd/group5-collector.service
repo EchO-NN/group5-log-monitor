@@ -1,0 +1,9 @@
+[Unit]
+Description=Group5 endpoint and VM9 metric collection
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/group5-log-monitor
+ExecStart=/usr/bin/python3 /opt/group5-log-monitor/scripts/collect-monitor-remotes.py
+UMask=0077

@@ -1,0 +1,38 @@
+{
+  "verification_date": "2026-11-15",
+  "component": "Wazuh Agent",
+  "version": "4.14.9",
+  "source_url": "https://github.com/wazuh/wazuh/archive/refs/tags/v4.14.9.tar.gz",
+  "source_sha256": "9d58c1c3cc42b4a0ccfc9424a4fe2b3d6fc88731380e97b4c687374dd5012fdc",
+  "commands": [
+    "make TARGET=agent deps",
+    "make TARGET=agent -j2"
+  ],
+  "result": "passed",
+  "platform": "x86_64",
+  "compiler": "gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "version_output": "Wazuh v4.14.9 - Wazuh Inc.\n \nThis program is free software; you can redistribute it and/or modify\nit under the terms of the GNU General Public License (version 2) as \npublished by the Free Software Foundation. For more details, go to \nhttps://www.gnu.org/licenses/gpl.html",
+  "artifacts": {
+    "wazuh-agentd": {
+      "size": 3183272,
+      "sha256": "df2e4439e337a30bc84691f871e06aefb97ed474d35f67223ec41d1bea2b52aa"
+    },
+    "wazuh-logcollector": {
+      "size": 3313760,
+      "sha256": "47c49c9c39c73332ce4e7c4e8d488fb4d5a60b8f3db276addd62630f1a76e6df"
+    },
+    "wazuh-syscheckd": {
+      "size": 3698360,
+      "sha256": "a5a33dba323db82c5ac1e7222df9d3823937ec7bdc44ebc28c5d814151e2fe40"
+    },
+    "wazuh-execd": {
+      "size": 3007640,
+      "sha256": "e987ea53a068c612af3a6f309a41c29d20b5678bddb80403b3467cffa609c83a"
+    },
+    "wazuh-modulesd": {
+      "size": 2894936,
+      "sha256": "af9fdaf4b27335d092f2bd5f7177b4d6cb417e24cd445a4f75ebf9dc4204da4a"
+    }
+  },
+  "deployment": "compiled locally; existing VM services were not replaced"
+}

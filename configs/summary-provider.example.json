@@ -1,0 +1,13 @@
+{
+  "endpoint": "https://api.example.invalid/v1/responses",
+  "model": "gpt-6.1-sol",
+  "effort": "xhigh",
+  "credential_file": "/etc/group5-monitor/provider.local.json",
+  "remote_bridge": "/usr/local/lib/group5-monitor/bridge.py",
+  "remote_config": "/etc/group5-monitor/config.json",
+  "poll_seconds": 20,
+  "fetch_local_report": false,
+  "first_text_timeout_seconds": 600,
+  "output_idle_timeout_seconds": 180,
+  "request_total_timeout_seconds": 1800
+}

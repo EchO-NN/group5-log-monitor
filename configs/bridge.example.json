@@ -1,0 +1,18 @@
+{
+  "state_dir": "/var/lib/group5-monitor",
+  "case_id": 1,
+  "customer_id": 1,
+  "iris_url": "https://iris.example.invalid",
+  "wazuh_url": "https://wazuh.example.invalid",
+  "credential_file": "/etc/group5-monitor/iris.local.json",
+  "ca_file": "/etc/group5-monitor/iris-ca.pem",
+  "log_roots": ["/var/ossec/logs/alerts", "/var/ossec/logs/archives", "/var/lib/group5-monitor/management-inbox"],
+  "poll_seconds": 5,
+  "report_seconds": 300,
+  "batch_size": 20,
+  "presentation_mode": "post_finish",
+  "summary_enabled": true,
+  "analysis_engine": "agent-v1",
+  "analysis_settle_seconds": 60,
+  "analysis_drain_seconds": 300
+}

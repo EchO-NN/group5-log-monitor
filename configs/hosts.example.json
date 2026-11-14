@@ -1,0 +1,12 @@
+{
+  "hosts": {
+    "VM2": {"ssh_alias": "lab-vm2"},
+    "VM3": {"ssh_alias": "lab-vm3"},
+    "VM4": {"ssh_alias": "lab-vm4"},
+    "VM5": {"ssh_alias": "lab-vm5"},
+    "VM6": {"ssh_alias": "lab-vm6"},
+    "VM7": {"ssh_alias": "lab-vm7"},
+    "VM8": {"ssh_alias": "lab-vm8"},
+    "VM9": {"ssh_alias": "lab-vm9"}
+  }
+}
