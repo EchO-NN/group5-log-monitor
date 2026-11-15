@@ -127,14 +127,14 @@ def query_files(permit):
 
 
 def execute_query(worker,config,envelope,root,permit,preview,heartbeat):
-    archived=permit['request']['query'] in ('database_changes','application_errors','business_probes')
+    archived=permit['request']['query'] in ('database_changes','application_errors','business_probes','performance_metrics','performance_correlations')
     files=permit['request']['query']=='files'
     preview.stage('investigating',agent=True,current_action='inspect_files' if files else 'query_collected' if archived else 'query_host',purpose=permit['purpose'],query_host={0:'A'}.get(permit['request']['role'],'VM'+str(permit['request']['role'])),file_path=permit['request'].get('path') if files else None,audit_page=permit['request'].get('cursor',{}).get('page',1) if permit['request']['query']=='audit' else None)
     path=root/('query-'+permit['id']+'.json')
     if path.exists():saved=json.loads(path.read_text());assert saved['permit']==permit;result=saved['result']
     else:
         heartbeat()
-        if permit['request']['query'] in ('database_changes','application_errors','business_probes'):
+        if archived:
             result=rpc(worker,config,envelope,'archive_read',query_id=permit['id'])
         elif files:result=query_files(permit)
         else:result=query_guest(permit)

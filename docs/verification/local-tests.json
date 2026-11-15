@@ -1,22 +1,23 @@
 {
   "date": "2026-11-15",
-  "public_project_tests": 183,
+  "public_project_tests": 185,
   "status": "passed",
   "command": "python3 -m unittest discover -s scripts -p 'test_monitor*.py'",
-  "original_workspace_tests": 181,
+  "original_workspace_tests": 183,
   "vm9_online_validation": "not_run_vm9_offline",
   "offline_performance_demo": "passed",
   "wazuh_source_build": "passed",
   "artifacts": [
     {
       "name": "group5_log_monitor-1.1.0-py3-none-any.whl",
-      "sha256": "95bd8040002ed6d3f98ce32e11a13bfdc52857ac63a204c02226f580b6a8acd8",
+      "sha256": "9995228f821ff92bdbf9be14406136f304b5e919642bd76b2920f9c5eab94a7e",
       "size": 93828
     },
     {
       "name": "group5_log_monitor-1.1.0.tar.gz",
-      "sha256": "d4ed083398dc2c039ac68fd686da50d9d666f7dde8b5b181d00f444303645e03",
-      "size": 80607
+      "sha256": "836f87138b2689cdbe2cba1b384ee1121c614817abe8c613ccef43cd30f07ee3",
+      "size": 80657
     }
-  ]
+  ],
+  "performance_executor_route_regressions": 2
 }

@@ -18,6 +18,7 @@ import agent_workflow as agent
 import agent_query_guest as guest
 import agent_runner
 import case_writer
+import performance
 from test_monitor_summary import worker
 
 
@@ -76,6 +77,33 @@ class AgentTests(unittest.TestCase):
         permit=result['permit']
         response=agent.dispatch(self.store,self.client,dict(id=self.job['id'],token=self.job['token'],operation='archive_read',query_id=permit['id']))
         self.assertTrue(response['ok']);self.assertEqual(response['coverage'],'no_saved_samples')
+    def assert_performance_archive_route(self,query):
+        self.plan()
+        at=self.job['payload']['observations'][0]['first_seen']
+        point=performance.normalized_point('cpu_percent','192.168.29.50:9100',performance.epoch(at),83)
+        event=performance.event(point)
+        with self.store.db:self.store.enqueue(event,canonical(event),'fixture')
+        permit=self.call('query_collected',{'task_id':'T01','host':'VM9','query':query,'match':''})['permit']
+        envelope={k:self.job[k] for k in ('id','token')}
+        root=Path(self.tmp.name)/'performance-checkpoints';root.mkdir()
+        preview=Mock();worker_mock=Mock()
+        worker_mock.remote.side_effect=lambda _config,_action,payload:agent.dispatch(self.store,self.client,payload)
+        with patch('agent_runner.query_guest',side_effect=AssertionError('unexpected guest query')) as guest_query,patch('agent_runner.query_files',side_effect=AssertionError('unexpected file query')) as file_query:
+            result=agent_runner.execute_query(worker_mock,{},envelope,root,permit,preview,lambda:None)
+        guest_query.assert_not_called();file_query.assert_not_called()
+        self.assertEqual([call.args[2]['operation'] for call in worker_mock.remote.call_args_list],['archive_read','query_result'])
+        self.assertEqual(preview.stage.call_args.kwargs['current_action'],'query_collected')
+        self.assertTrue(result['ok']);self.assertEqual(result['reference'],'E001')
+        self.assertEqual(result['result']['query'],query)
+        self.assertEqual(result['result']['scope'],'historical_saved_telemetry')
+        self.assertEqual(result['result']['records'][0]['target_host'],'VM7')
+        state=agent.state_for(self.store,self.job)
+        self.assertIsNone(state['active_query']);self.assertEqual(state['tasks'][0]['query_refs'],['E001'])
+        self.assertEqual(state['observations'][-1]['source'],'saved_monitor_telemetry')
+    def test_performance_metrics_executor_reads_archive_without_guest_transport(self):
+        self.assert_performance_archive_route('performance_metrics')
+    def test_performance_correlations_executor_reads_archive_without_guest_transport(self):
+        self.assert_performance_archive_route('performance_correlations')
     def query(self):
         result=self.call('query_host',{'task_id':'T01','host':'VM7','query':'backup_inventory','match':''});self.assertIn('permit',result)
         permit=result['permit'];request=permit['request'];data=dict(ok=True,host='VM7',query='backup_inventory',requested_start=request['start'],requested_end=request['end'],collected_at=now(),scope='current_snapshot_not_historical',records=[{'path':'/lab_backup/example.tar.gz','present':True,'size':10}],truncated=False)
